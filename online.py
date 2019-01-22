@@ -26,7 +26,7 @@ def game_cate():
         game_name = s['game_name']
         short_name = s['short_name']
         game_url = s['game_url']
-        sql = "INSERT INTO `game_cate` (`cate_id`, `game_name`, `short_name`, `game_url`) VALUES ('%s', '%s', '%s', '%s') ON DUPLICATE KEY UPDATE `cate_id` = '%s', `game_name` = '%s', `short_name` = '%s', `game_url` = '%s'" % (cate_id, game_name, short_name, game_url, cate_id, game_name, short_name, game_url)
+        sql = "INSERT INTO `game_cate` (`cate_id`, `game_name`, `short_name`, `game_url`, `room_num`) VALUES ('%s', '%s', '%s', '%s', 0) ON DUPLICATE KEY UPDATE `cate_id` = '%s', `game_name` = '%s', `short_name` = '%s', `game_url` = '%s', `room_num` = 0" % (cate_id, game_name, short_name, game_url, cate_id, game_name, short_name, game_url)
         try:
             cursor.execute(sql)
             db.commit()
@@ -82,10 +82,23 @@ def room(game_cate_id):
         except:
             print('it is faild to update the number of room')
         db.close()
+#将每个房间的热度重置为0
+def reset_hn():
+    db = pymysql.connect('localhost', 'root', 'root', 'dy')
+    cursor = db.cursor()
+    sql = "UPDATE `room_hn` SET `hn` = 0"
+    try:
+        cursor.execute(sql)
+        db.commit()
+    except:
+        print('it is faild to update hn')
+        db.rollback()
+    db.close()
 if __name__ == '__main__':
     # while True:
     start = time.clock()
     game_cate()
+    reset_hn()
     # use threadPool to improve speed
     # open 20 thread pools
     p = ThreadPoolExecutor(20)
